@@ -1,4 +1,4 @@
-import yaml, sys, argparse
+import yaml, sys, argparse, logging, time
 import beeprint as bprint
 from models.snack import Snack
 from models.order import Order, Orders
@@ -12,8 +12,15 @@ parser = argparse.ArgumentParser(
 parser.add_argument("balance", help="The current balance of the card [default JMF]", type=int)
 parser.add_argument("menu", help="Vending machine's menu [.yml, .yaml]", type=argparse.FileType("r"))
 parser.add_argument("-p", "--printMenu", dest="print_menu", action="store_true", help="Prints the menu")
+parser.add_argument("-i", "--info", dest="log_info", action="store_true", help="Prints log messages")
 parser.add_argument("-l", "--limit", dest="limit", type=int, default=3, help="Possible order solution limit")
 args = parser.parse_args()
+
+# Set the logging config
+if args.log_info:
+    logging.basicConfig(level=logging.INFO)
+else:
+    logging.basicConfig(level=logging.WARNING)
 
 # Calculates the best order
 def _calc_order(balance: int, snacks: list[Snack]):
@@ -21,6 +28,7 @@ def _calc_order(balance: int, snacks: list[Snack]):
     desired_items: list[Order] = []
     
     # Pick out the desired items first
+    logging.info("Picking out the desired items...")
     for snack in snacks:
         if snack.desired > 0:
             balance -= snack.price * snack.desired
@@ -50,9 +58,14 @@ def _calc_order(balance: int, snacks: list[Snack]):
     #   it makes the program much faster
     start_snack_price = snacks[0].price
     root = Node(start_snack_price, balance)
+    logging.info("Building graph...")
+    start_time = time.time()
     build_graph(root, distinct_prices)
-    
+    end_time = time.time()
+    logging.info(f"Graph building finished! ({round(end_time - start_time, 1)} seconds)")
+
     # Find the optimal child in graph
+    logging.info("Finding the best order list...")
     possible_orders: list[Node] = my_dfs(root)
 
     # Find the minimal balance    
@@ -64,6 +77,7 @@ def _calc_order(balance: int, snacks: list[Snack]):
     minimals = set(filter(lambda o: o.balance == min_balance, possible_orders))
     
     # Create possible orders
+    logging.info("Creating order list...")
     limit = args.limit
     for m in minimals:
         
@@ -128,8 +142,12 @@ def main():
         print("Menu list path was not given!")
         sys.exit(1)
     
+    logging.info("Loading menu...")
     menu = load_menu()
+    logging.info("Menu loaded!")
+    
     possible_orders = _calc_order(args.balance, menu)
+    logging.info("Searching finished!")
     
     print("Possible orders:")
     for po in possible_orders:

@@ -14,6 +14,7 @@ parser.add_argument("menu", help="Vending machine's menu [.yml, .yaml]", type=ar
 parser.add_argument("-p", "--printMenu", dest="print_menu", action="store_true", help="Prints the menu")
 parser.add_argument("-i", "--info", dest="log_info", action="store_true", help="Prints log messages")
 parser.add_argument("-l", "--limit", dest="limit", type=int, default=3, help="Possible order solution limit")
+parser.add_argument("-o", "-out", dest="out_file", type=argparse.FileType("w", encoding="UTF-8"), help="The output file path")
 args = parser.parse_args()
 
 # Set the logging config
@@ -149,6 +150,9 @@ def main():
     possible_orders = _calc_order(args.balance, menu)
     logging.info("Searching finished!")
     
+    if args.out_file is not None:
+        sys.stdout = args.out_file
+        
     print("Possible orders:")
     for po in possible_orders:
         po.show()

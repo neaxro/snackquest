@@ -14,51 +14,75 @@ parser.add_argument("-p", "--printMenu", dest="printMenu", action="store_true", 
 args = parser.parse_args()
 
 # Calculates the best order
-def calcOrder(menu: list[Snack]):
-    order: Order = Order(args.balance, menu)
+def calcOrder(balance: int, snacks: list[Snack]):
+    selected_items: list[Order] = []
     
-    for snack in order.snacks:
+    for snack in snacks:
         if snack.desired > 0:
-            order.balance -= snack.price * snack.desired
+            balance -= snack.price * snack.desired
             snack.tobuy = snack.desired
+            selected_items.append(
+                Order(
+                    snack.price,
+                    snack.desired,
+                    snack.name
+                )
+            )
 
         snack.desired = 0
     
-    if order.balance <= 0:
+    if balance <= 0:
         print("Your balance fall below 0 JMF, too much desired snacks!")
         sys.exit(1)
     
     # Smart algorithm
-    # table[row][col]
+    n = len(snacks)
+    prices = [snack.price for snack in snacks]
+    prices.sort()
+    
+    # Init table
+    dp = [[0] * (balance + 1) for _ in range(n + 1)]
 
-    n = len(order.snacks)
-    w = [snack.price for snack in order.snacks]
-    #v = [snack.price for snack in order.snacks]
-    v = [1]*n
-    W = order.balance
-    m = [[0 for i in range(W)] for j in range(n)]
+    # Dinamic programming
+    for i in range(1, n + 1):
+        for j in range(balance + 1):
+            max_value_without_current = dp[i - 1][j]
+
+            for k in range(1, (j // prices[i - 1]) + 1):
+                max_value_with_current = dp[i - 1][j - k * prices[i - 1]] + k * prices[i - 1]
+                max_value_without_current = max(max_value_without_current, max_value_with_current)
+
+            dp[i][j] = max_value_without_current
+
+    # Trace back the optimal order list
+    i, j = n, balance
+    while i > 0 and j > 0:
+        if dp[i][j] != dp[i - 1][j]:
+            # How many pieces we choose from the snack
+            count = j // prices[i - 1]
+            
+            # The choosable snacks
+            snack_names = []
+            for snack in snacks:
+                if snack.price == prices[i - 1]:
+                    snack_names.append(snack.name)
+            
+            # Create new order
+            selected_items.append(
+                Order(
+                    prices[i - 1],
+                    count,
+                    set(snack_names)
+                )
+            )
+            
+            j -= count * prices[i - 1]
+        i -= 1
         
-    w.sort()
+    # Optimal value
+    optimal_value = sum(order.price * order.count for order in selected_items)
     
-    for i in range(1, n):
-        for j in range(1, W):
-            if w[i] > j:
-                m[i][j] = m[i-1][j]
-            else:
-                m[i][j] = max(m[i-1][j], m[i-1][j-w[i]] + v[i])
-        
-    counts = [row[-1] for row in m]
-    
-    print(w)
-    print(counts)
-    
-    sum = 0
-    for i in range(n):
-        sum += w[i] * counts[i]
-        
-    print(f"sum: {sum}")
-    
-    return order
+    return optimal_value, selected_items
 
 # Loads the menu from the given path
 def loadMenu() -> list[Snack]:
@@ -104,9 +128,12 @@ def main():
         sys.exit(1)
     
     menu = loadMenu()
-    order = calcOrder(menu)
+    optimal_value, selected_items = calcOrder(args.balance, menu)
     
-    order.show()
+    print(f"Optimal value: {optimal_value} JMF")
+    print("Order:")
+    for order in selected_items:
+        order.show()
 
 if __name__ == "__main__":
     main()

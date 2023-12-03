@@ -1,7 +1,8 @@
-import yaml, sys, argparse
+import yaml, sys, argparse, logging, time
 import beeprint as bprint
 from models.snack import Snack
-from models.order import Order
+from models.order import Order, Orders
+from models.graph import *
 
 # Set the argument flags
 parser = argparse.ArgumentParser(
@@ -10,18 +11,29 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument("balance", help="The current balance of the card [default JMF]", type=int)
 parser.add_argument("menu", help="Vending machine's menu [.yml, .yaml]", type=argparse.FileType("r"))
-parser.add_argument("-p", "--printMenu", dest="printMenu", action="store_true", help="Prints the menu")
+parser.add_argument("-p", "--printMenu", dest="print_menu", action="store_true", help="Prints the menu")
+parser.add_argument("-i", "--info", dest="log_info", action="store_true", help="Prints log messages")
+parser.add_argument("-l", "--limit", dest="limit", type=int, default=3, help="Possible order solution limit")
 args = parser.parse_args()
 
+# Set the logging config
+if args.log_info:
+    logging.basicConfig(level=logging.INFO)
+else:
+    logging.basicConfig(level=logging.WARNING)
+
 # Calculates the best order
-def calc_order(balance: int, snacks: list[Snack]):
-    selected_items: list[Order] = []
+def _calc_order(balance: int, snacks: list[Snack]):
+    orders: list[Orders] = []
+    desired_items: list[Order] = []
     
+    # Pick out the desired items first
+    logging.info("Picking out the desired items...")
     for snack in snacks:
         if snack.desired > 0:
             balance -= snack.price * snack.desired
             snack.tobuy = snack.desired
-            selected_items.append(
+            desired_items.append(
                 Order(
                     snack.price,
                     snack.desired,
@@ -35,56 +47,59 @@ def calc_order(balance: int, snacks: list[Snack]):
         print("Your balance fall below 0 JMF, too much desired snacks!")
         sys.exit(1)
     
-    # Smart algorithm
-    n = len(snacks)
-    prices = [snack.price for snack in snacks]
-    prices.sort()
+    # Graph algorithm
+    distinct_prices = []
+    for snack in snacks:
+        distinct_prices.append(snack.price)
+    distinct_prices = set(distinct_prices)
     
-    # Init table
-    dp = [[0] * (balance + 1) for _ in range(n + 1)]
+    # Build a graph for one price (start_snack_price)
+    #   with this the alg is able to find the best possible solution
+    #   it makes the program much faster
+    start_snack_price = snacks[0].price
+    root = Node(start_snack_price, balance)
+    logging.info("Building graph...")
+    start_time = time.time()
+    build_graph(root, distinct_prices)
+    end_time = time.time()
+    logging.info(f"Graph building finished! ({round(end_time - start_time, 1)} seconds)")
 
-    # Dinamic programming
-    for i in range(1, n + 1):
-        for j in range(balance + 1):
-            max_value_without_current = dp[i - 1][j]
+    # Find the optimal child in graph
+    logging.info("Finding the best order list...")
+    possible_orders: list[Node] = my_dfs(root)
 
-            for k in range(1, (j // prices[i - 1]) + 1):
-                max_value_with_current = dp[i - 1][j - k * prices[i - 1]] + k * prices[i - 1]
-                max_value_without_current = max(max_value_without_current, max_value_with_current)
-
-            dp[i][j] = max_value_without_current
-
-    # Trace back the optimal order list
-    i, j = n, balance
-    while i > 0 and j > 0:
-        if dp[i][j] != dp[i - 1][j]:
-            # How many pieces we choose from the snack
-            count = j // prices[i - 1]
-            
-            # The choosable snacks
-            snack_names = []
-            for snack in snacks:
-                if snack.price == prices[i - 1]:
-                    snack_names.append(snack.name)
-            
-            # Create new order
-            selected_items.append(
-                Order(
-                    prices[i - 1],
-                    count,
-                    set(snack_names)
-                )
-            )
-            
-            j -= count * prices[i - 1]
-        i -= 1
+    # Find the minimal balance    
+    min_balance = possible_orders[0].balance
+    for po in possible_orders:
+        if po.balance < min_balance:
+            min_balance = po.balance
+    
+    minimals = set(filter(lambda o: o.balance == min_balance, possible_orders))
+    
+    # Create possible orders
+    logging.info("Creating order list...")
+    limit = args.limit
+    for m in minimals:
         
-    # Optimal value
-    optimal_value = sum(order.price * order.count for order in selected_items)
-    
-    return optimal_value, selected_items
+        if(limit <= 0):
+            break
+        else:
+            limit -= 1
+        
+        total_orders = desired_items.copy()
+        total_orders.extend(m.get_order(snacks))
+        
+        orders.append(
+            Orders(
+                min_balance,
+                total_orders
+            )
+        )
+        total_orders = []
+        
+    return orders
 
-# Loads the menu from the given path
+# Loads the menu from the given yaml file
 def load_menu() -> list[Snack]:
     menu = []
     menu_yaml = None
@@ -100,7 +115,7 @@ def load_menu() -> list[Snack]:
         print("File was not found!")
         sys.exit(1)
         
-    if args.printMenu:
+    if args.print_menu:
         bprint.pp(menu_yaml)
 
     menu_yaml = menu_yaml.get('items')
@@ -127,13 +142,16 @@ def main():
         print("Menu list path was not given!")
         sys.exit(1)
     
+    logging.info("Loading menu...")
     menu = load_menu()
-    optimal_value, selected_items = calc_order(args.balance, menu)
+    logging.info("Menu loaded!")
     
-    print(f"Optimal value: {optimal_value} JMF")
-    print("Order:")
-    for order in selected_items:
-        order.show()
+    possible_orders = _calc_order(args.balance, menu)
+    logging.info("Searching finished!")
+    
+    print("Possible orders:")
+    for po in possible_orders:
+        po.show()
 
 if __name__ == "__main__":
     main()

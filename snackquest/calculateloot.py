@@ -3,6 +3,9 @@ import beeprint as bprint
 from models.snack import Snack
 from models.order import Order, Orders
 from models.graph import *
+from rich.console import Console
+from rich.table import Table
+from rich.padding import Padding
 
 # Set the argument flags
 parser = argparse.ArgumentParser(
@@ -38,7 +41,7 @@ def _calc_order(balance: int, snacks: list[Snack]):
                 Order(
                     snack.price,
                     snack.desired,
-                    snack.name
+                    {snack.name}
                 )
             )
 
@@ -133,6 +136,28 @@ def load_menu() -> list[Snack]:
         
     return menu
 
+def _print_solutions(solutions: list[Orders]):
+    console = Console()
+    
+    for solution_index in range(len(solutions)):
+        table = Table(
+            title=f"Solution #{solution_index + 1}",
+            caption=f"Final balance: {solutions[solution_index].balance} JMF",
+            )
+        
+        # Add columns
+        table.add_column("Price")
+        table.add_column("Count")
+        table.add_column("Snack Options")
+        
+        # Add rows
+        for order in solutions[solution_index].orders:
+            table.add_row(str(order.price), str(order.count), order.get_snacks())
+        
+        # Print table
+        console.print(Padding("", (1, 0, 0, 0)))
+        console.print(table)
+
 # MAIN
 def main():
     if args.balance is None:
@@ -153,9 +178,11 @@ def main():
     if args.out_file is not None:
         sys.stdout = args.out_file
         
-    print("Possible orders:")
+    """ print("Possible orders:")
     for po in possible_orders:
-        po.show()
+        po.show() """
+    
+    _print_solutions(possible_orders)
 
 if __name__ == "__main__":
     main()

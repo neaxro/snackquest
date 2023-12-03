@@ -6,6 +6,16 @@ class Order:
         
     def show(self) -> None:
         print(f"Price: {self.price} JMF [{self.count}] ({self.snacks})")
+    
+    def get_snacks(self) -> str:
+        snacks_string = ""
+        snacks = list(self.snacks)
+        
+        for i in range(len(self.snacks) - 1):
+            snacks_string += snacks[i] + ", "
+        snacks_string += str(snacks[-1])
+        
+        return snacks_string
         
 class Orders:
     def __init__(self, balance: int, orders: list[Order]) -> None:

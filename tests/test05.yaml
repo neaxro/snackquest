@@ -1,0 +1,36 @@
+---
+items:
+  - name: Snickers
+    price: 300
+    desired: 1
+    available: True
+
+  - name: Twix
+    price: 280
+    desired: 1
+    available: True
+
+  - name: Bounty
+    price: 320
+    desired: 1
+    available: True
+
+  - name: Kinder Bueno
+    price: 310
+    desired: 1
+    available: True
+
+  - name: Mars
+    price: 290
+    desired: 1
+    available: True
+
+  - name: Sport
+    price: 270
+    desired: 1
+    available: True
+
+  - name: MilkyWay
+    price: 330
+    desired: 0
+    available: True

@@ -14,7 +14,7 @@ parser.add_argument("-p", "--printMenu", dest="printMenu", action="store_true", 
 args = parser.parse_args()
 
 # Calculates the best order
-def calcOrder(balance: int, snacks: list[Snack]):
+def calc_order(balance: int, snacks: list[Snack]):
     selected_items: list[Order] = []
     
     for snack in snacks:
@@ -85,12 +85,12 @@ def calcOrder(balance: int, snacks: list[Snack]):
     return optimal_value, selected_items
 
 # Loads the menu from the given path
-def loadMenu() -> list[Snack]:
+def load_menu() -> list[Snack]:
     menu = []
-    menuYaml = None
+    menu_yaml = None
     
     try:
-        menuYaml = yaml.safe_load(args.menu)
+        menu_yaml = yaml.safe_load(args.menu)
 
     except ValueError:
         print("Invalid value!")
@@ -101,11 +101,11 @@ def loadMenu() -> list[Snack]:
         sys.exit(1)
         
     if args.printMenu:
-        bprint.pp(menuYaml)
+        bprint.pp(menu_yaml)
 
-    menuYaml = menuYaml.get('items')
+    menu_yaml = menu_yaml.get('items')
     
-    for item in menuYaml:
+    for item in menu_yaml:
         if(item['available']):
             menu.append(
                 Snack(
@@ -127,8 +127,8 @@ def main():
         print("Menu list path was not given!")
         sys.exit(1)
     
-    menu = loadMenu()
-    optimal_value, selected_items = calcOrder(args.balance, menu)
+    menu = load_menu()
+    optimal_value, selected_items = calc_order(args.balance, menu)
     
     print(f"Optimal value: {optimal_value} JMF")
     print("Order:")

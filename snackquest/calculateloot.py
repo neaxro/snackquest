@@ -1,8 +1,11 @@
-import yaml, sys, argparse, logging, time
+import yaml, sys, argparse, logging, time, random
 import beeprint as bprint
 from models.snack import Snack
 from models.order import Order, Orders
 from models.graph import *
+from rich.console import Console
+from rich.table import Table
+from rich.padding import Padding
 
 # Set the argument flags
 parser = argparse.ArgumentParser(
@@ -14,6 +17,7 @@ parser.add_argument("menu", help="Vending machine's menu [.yml, .yaml]", type=ar
 parser.add_argument("-p", "--printMenu", dest="print_menu", action="store_true", help="Prints the menu")
 parser.add_argument("-i", "--info", dest="log_info", action="store_true", help="Prints log messages")
 parser.add_argument("-l", "--limit", dest="limit", type=int, default=3, help="Possible order solution limit")
+parser.add_argument("-o", "-out", dest="out_file", type=argparse.FileType("w", encoding="UTF-8"), help="The output file path")
 args = parser.parse_args()
 
 # Set the logging config
@@ -37,7 +41,7 @@ def _calc_order(balance: int, snacks: list[Snack]):
                 Order(
                     snack.price,
                     snack.desired,
-                    snack.name
+                    {snack.name}
                 )
             )
 
@@ -74,20 +78,16 @@ def _calc_order(balance: int, snacks: list[Snack]):
         if po.balance < min_balance:
             min_balance = po.balance
     
-    minimals = set(filter(lambda o: o.balance == min_balance, possible_orders))
+    minimals = list(set(filter(lambda o: o.balance == min_balance, possible_orders)))
     
     # Create possible orders
     logging.info("Creating order list...")
     limit = args.limit
-    for m in minimals:
-        
-        if(limit <= 0):
-            break
-        else:
-            limit -= 1
+    for i in range(limit):
+        random_index = random.randint(0, len(minimals)-1)
         
         total_orders = desired_items.copy()
-        total_orders.extend(m.get_order(snacks))
+        total_orders.extend(minimals[random_index].get_order(snacks))
         
         orders.append(
             Orders(
@@ -132,6 +132,38 @@ def load_menu() -> list[Snack]:
         
     return menu
 
+def _print_solutions(solutions: list[Orders]):
+    console = Console()
+    
+    for solution_index in range(len(solutions)):
+        table = Table(
+            title=f"Solution #{solution_index + 1}",
+            caption=f"Final balance: {solutions[solution_index].balance} JMF",
+            )
+        
+        # Add columns
+        table.add_column("Snack Options")
+        table.add_column("Count")
+        table.add_column("Price", justify="right")
+        
+        # Add rows
+        sum = 0
+        for order in solutions[solution_index].orders:
+            sum += order.price * order.count
+            table.add_row(
+                order.get_snacks(),
+                str(order.count),
+                str(order.price),
+                )
+        
+        # Add footer
+        table.add_section()
+        table.add_row("", "Total", str(sum))
+        
+        # Print table
+        console.print(Padding("", (1, 0, 0, 0)))
+        console.print(table)
+
 # MAIN
 def main():
     if args.balance is None:
@@ -149,9 +181,14 @@ def main():
     possible_orders = _calc_order(args.balance, menu)
     logging.info("Searching finished!")
     
-    print("Possible orders:")
+    if args.out_file is not None:
+        sys.stdout = args.out_file
+        
+    """ print("Possible orders:")
     for po in possible_orders:
-        po.show()
+        po.show() """
+    
+    _print_solutions(possible_orders)
 
 if __name__ == "__main__":
     main()

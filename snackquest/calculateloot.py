@@ -1,4 +1,4 @@
-import yaml, sys, argparse, logging, time
+import yaml, sys, argparse, logging, time, random
 import beeprint as bprint
 from models.snack import Snack
 from models.order import Order, Orders
@@ -78,20 +78,16 @@ def _calc_order(balance: int, snacks: list[Snack]):
         if po.balance < min_balance:
             min_balance = po.balance
     
-    minimals = set(filter(lambda o: o.balance == min_balance, possible_orders))
+    minimals = list(set(filter(lambda o: o.balance == min_balance, possible_orders)))
     
     # Create possible orders
     logging.info("Creating order list...")
     limit = args.limit
-    for m in minimals:
-        
-        if(limit <= 0):
-            break
-        else:
-            limit -= 1
+    for i in range(limit):
+        random_index = random.randint(0, len(minimals)-1)
         
         total_orders = desired_items.copy()
-        total_orders.extend(m.get_order(snacks))
+        total_orders.extend(minimals[random_index].get_order(snacks))
         
         orders.append(
             Orders(
@@ -146,13 +142,23 @@ def _print_solutions(solutions: list[Orders]):
             )
         
         # Add columns
-        table.add_column("Price")
-        table.add_column("Count")
         table.add_column("Snack Options")
+        table.add_column("Count")
+        table.add_column("Price", justify="right")
         
         # Add rows
+        sum = 0
         for order in solutions[solution_index].orders:
-            table.add_row(str(order.price), str(order.count), order.get_snacks())
+            sum += order.price * order.count
+            table.add_row(
+                order.get_snacks(),
+                str(order.count),
+                str(order.price),
+                )
+        
+        # Add footer
+        table.add_section()
+        table.add_row("", "Total", str(sum))
         
         # Print table
         console.print(Padding("", (1, 0, 0, 0)))

@@ -1,2 +1,2 @@
-build:
-	pyinstaller --onefile snackquest/calculateloot.py
+packages:
+	pip install -r requirements.txt

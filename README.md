@@ -11,6 +11,11 @@
     ```
 2. Install packages
     ```sh
+    make packages 
+    ```
+    or
+    
+    ```sh
     pip install -r requirements.txt
     ```
 

@@ -1,4 +1,3 @@
-import yaml
 import pulp
 import beeprint as bprint
 
@@ -7,9 +6,7 @@ from rich.table import Table
 from rich.padding import Padding
 
 
-def solve_problem(budget, menu_file, print_menu=False):
-    data = yaml.safe_load(menu_file)
-    
+def solve_problem(budget, data, print_menu=False, headless=False):
     if print_menu:
         bprint.pp(data)
 
@@ -63,7 +60,15 @@ def solve_problem(budget, menu_file, print_menu=False):
                     }
                 )
         
-        _print_solution(budget, final_items, total_candies, total_cost)
+        if not headless:
+            _print_solution(budget, final_items, total_candies, total_cost)
+        
+        return {
+            'budget': budget,
+            'final_items': final_items,
+            'total_candies': total_candies,
+            'total_cost': total_cost
+        }
     else:
         print("No solution found.")
 

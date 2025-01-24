@@ -1,5 +1,6 @@
 import argparse
 import sys
+import yaml
 
 from solver import solve_problem
 
@@ -30,9 +31,9 @@ def main():
         
     if args.out_file is not None:
         sys.stdout = args.out_file
-        
+
     # Solve problem.
-    solve_problem(args.budget, args.menu, args.print_menu)
+    solve_problem(args.budget, yaml.safe_load(args.menu), args.print_menu)
 
 if __name__ == "__main__":
     main()

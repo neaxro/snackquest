@@ -5,12 +5,8 @@ from snackquest.solver import solve_problem
 
 app = Flask(__name__)
 
-@app.route("/calculator")
+@app.route("/calculator", methods=["GET", "POST"])
 def calculator():
-    return render_template("calculator.html")
-
-@app.route("/calculate", methods=["POST"])
-def calculate():
     if request.form:
         try:
             budget = int(request.form.get("budget"))
@@ -19,11 +15,11 @@ def calculate():
             result = solve_problem(budget, menu, headless=True)
             print(result)
 
-            return render_template("result.html", result=result)
+            return render_template("calculator.html", result=result)
         except Exception as e:
             return f"Error: {e}"
-
-    return "Nope"
+    else:
+        return render_template("calculator.html")
 
 @app.route("/")
 @app.route("/home")

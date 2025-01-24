@@ -22,7 +22,7 @@
   <div class="container">
     <h1 class="mb-4 mt-4">Calculator</h1>
 
-    <form id="calculator" action="/calculate" method="post">
+    <form id="calculator" action="/calculator" method="post" class="mb-5">
 
       <div class="mb-3">
         <label for="budget" class="form-label">Budget</label>
@@ -39,6 +39,16 @@
       <button type="submit" id="submitButton" class="btn btn-primary" disabled>Calculate</button>
 
     </form>
+
+    {% if result is defined and result is not none %}
+    {% include 'result_table.html' %}
+    {% elif result is defined and result is none %}
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+      <div>
+        There is no solution!
+      </div>
+    </div>
+    {% endif %}
 
     <script>
       const menu = document.getElementById('menu');

@@ -31,7 +31,7 @@
 
       <div class="mb-3">
         <label for="menu" class="form-label">Paste menu file</label>
-        <textarea class="form-control" id="menu" name="menu" rows="30"
+        <textarea class="form-control" id="menu" name="menu" rows="15"
           placeholder="{% include 'yaml_placeholder.yaml' %}"></textarea>
         <div id="errorMessage" class="error mt-2"></div>
       </div>
@@ -51,6 +51,7 @@
     {% endif %}
 
     <script>
+      const budget = document.getElementById('budget');
       const menu = document.getElementById('menu');
       const errorMessage = document.getElementById('errorMessage');
       const submitButton = document.getElementById('submitButton');
@@ -66,10 +67,39 @@
         }
       }
 
+      function saveData(budget_value, menu_value){
+        localStorage.setItem("budget", budget_value);
+        localStorage.setItem("menu", menu_value);
+      }
+
+      function getData(){
+        try{
+          var budget_value = localStorage.getItem("budget");
+          var menu_value = localStorage.getItem("menu");
+
+          budget.value = budget_value;
+          menu.value = menu_value;
+        } catch(error) {
+          budget.value = 0;
+          menu.value = "";
+        }
+      }
+
       menu.addEventListener('input', () => {
         const content = menu.value;
         validateYAML(content);
       });
+
+      submitButton.addEventListener('click', () => {
+        const budget_value = budget.value;
+        const menu_value = menu.value;
+
+        saveData(budget_value, menu_value);
+      });
+
+      getData();
+      validateYAML(menu.value);
+
     </script>
 </body>
 

@@ -17,7 +17,7 @@ def calculator():
 
             return render_template("calculator.html", result=result)
         except Exception as e:
-            return f"Error: {e}"
+            return render_template("calculator.html", error=e)
     else:
         return render_template("calculator.html")
 

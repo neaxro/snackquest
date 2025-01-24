@@ -8,9 +8,9 @@ def _init_args():
     # Set the argument flags
     parser = argparse.ArgumentParser(
         prog="Vending Machine Loot Calculator",
-        description="From the given balance and menu list calculates the optimal order to leave as less money on the card as possible."
+        description="From the given budget and menu list calculates the optimal order to leave as less money on the card as possible."
     )
-    parser.add_argument("balance", help="The current balance of the card [default JMF]", type=int)
+    parser.add_argument("budget", help="The current budget of the card [default JMF]", type=int)
     parser.add_argument("menu", help="Vending machine's menu [.yml, .yaml]", type=argparse.FileType("r"))
     parser.add_argument("-p", "--printMenu", dest="print_menu", action="store_true", help="Prints the menu")
     parser.add_argument("-o", "-out", dest="out_file", type=argparse.FileType("w", encoding="UTF-8"), help="The output file path")
@@ -20,8 +20,8 @@ def _init_args():
 def main():
     args = _init_args()
     
-    if args.balance is None:
-        print("Balance was not given!")
+    if args.budget is None:
+        print("budget was not given!")
         sys.exit(1)
         
     if args.menu is None:
@@ -32,7 +32,7 @@ def main():
         sys.stdout = args.out_file
         
     # Solve problem.
-    solve_problem(args.balance, args.menu, args.print_menu)
+    solve_problem(args.budget, args.menu, args.print_menu)
 
 if __name__ == "__main__":
     main()

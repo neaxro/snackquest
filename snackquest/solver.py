@@ -7,9 +7,8 @@ from rich.table import Table
 from rich.padding import Padding
 
 
-def solve_problem(balance, menu_file, print_menu=False):
+def solve_problem(budget, menu_file, print_menu=False):
     data = yaml.safe_load(menu_file)
-    budget = balance
     
     if print_menu:
         bprint.pp(data)
@@ -64,23 +63,23 @@ def solve_problem(balance, menu_file, print_menu=False):
                     }
                 )
         
-        _print_solution(balance, final_items, total_candies, total_cost)
+        _print_solution(budget, final_items, total_candies, total_cost)
     else:
         print("No solution found.")
 
-def _print_solution(balance, final_items, total_candies, total_cost):
+def _print_solution(budget, final_items, total_candies, total_cost):
     console = Console()
     
     # Create table
     table = Table(
         title=f"The Optimal Solution",
-        caption=f"Initial budget: {balance} JMF",
+        caption=f"Initial budget: {budget}",
     )
     
     # Add columns
     table.add_column("Snack Options")
     table.add_column("Count")
-    table.add_column("Unit price (JMF)", justify="right")
+    table.add_column("Unit price", justify="right")
     
     # Add rows
     for item in final_items:
@@ -93,9 +92,9 @@ def _print_solution(balance, final_items, total_candies, total_cost):
     # Add footer
     table.add_section()
     table.add_row("Total", str(total_candies), str(total_cost))
-    table.add_row("Remaining", "", str(balance-total_cost))
+    table.add_row("Remaining", "", str(budget-total_cost))
     table.add_section()
-    table.add_row("Initial budget", "", str(balance))
+    table.add_row("Initial budget", "", str(budget))
 
     # Print table
     console.print(Padding("", (0, 0, 0, 0)))

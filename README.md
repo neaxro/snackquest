@@ -20,10 +20,10 @@
     ```
 
 ## :dart: Usage
-From the given balance and menu list calculates the optimal order to leave as less money on the card as possible.
+From the given budget and menu list calculates the optimal order to leave as less money on the card as possible.
 
 ```sh
-python3 snackquest.py balance menu.yaml
+python3 snackquest.py budget menu.yaml
 ```
 Example how to calculate best order list:
 ```sh
@@ -42,7 +42,7 @@ user@ubuntu:~/snackquest$ python3 snackquest/snackquest.py 2300 examples/example
 ├────────────────┼───────┼───────┤
 │                │ Total │  2300 │
 └────────────────┴───────┴───────┘
-       Final balance: 0 JMF
+       Final budget: 0 JMF
 
            Solution #2
 ┏━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┓
@@ -54,7 +54,7 @@ user@ubuntu:~/snackquest$ python3 snackquest/snackquest.py 2300 examples/example
 ├────────────────┼───────┼───────┤
 │                │ Total │  2300 │
 └────────────────┴───────┴───────┘
-       Final balance: 0 JMF
+       Final budget: 0 JMF
 
 user@ubuntu:~/snackquest$
 ```

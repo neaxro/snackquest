@@ -20,10 +20,10 @@
     ```
 
 ## :dart: Usage
-From the given balance and menu list calculates the optimal order to leave as less money on the card as possible.
+From the given budget and menu list calculates the optimal order to leave as less money on the card as possible.
 
 ```sh
-python3 snackquest.py balance menu.yaml
+python3 snackquest.py budget menu.yaml
 ```
 Example how to calculate best order list:
 ```sh
@@ -33,28 +33,21 @@ Output:
 ```sh
 user@ubuntu:~/snackquest$ python3 snackquest/snackquest.py 2300 examples/example01.yaml
 
-           Solution #1
-┏━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┓
-┃ Snack Options  ┃ Count ┃ Price ┃
-┡━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━┩
-│ Twix           │ 5     │   280 │
-│ Snickers, Mars │ 3     │   300 │
-├────────────────┼───────┼───────┤
-│                │ Total │  2300 │
-└────────────────┴───────┴───────┘
-       Final balance: 0 JMF
-
-           Solution #2
-┏━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┓
-┃ Snack Options  ┃ Count ┃ Price ┃
-┡━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━┩
-│ Twix           │ 6     │   280 │
-│ Bounty         │ 1     │   320 │
-│ Snickers, Mars │ 1     │   300 │
-├────────────────┼───────┼───────┤
-│                │ Total │  2300 │
-└────────────────┴───────┴───────┘
-       Final balance: 0 JMF
+         The Optimal Solution          
+┏━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ Snack Options  ┃ Count ┃ Unit price ┃
+┡━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ Snickers       │ 0     │        300 │
+│ Twix           │ 8     │        280 │
+│ Bounty         │ 0     │        320 │
+│ Mars           │ 0     │        290 │
+├────────────────┼───────┼────────────┤
+│ Total          │ 8     │       2240 │
+│ Remaining      │       │         60 │
+├────────────────┼───────┼────────────┤
+│ Initial budget │       │       2300 │
+└────────────────┴───────┴────────────┘
+         Initial budget: 2300
 
 user@ubuntu:~/snackquest$
 ```

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: snackquest
-          image: axelnemes/snackquest # {"$imagepolicy": "app-snackquest:snackquest"}
+          image: axelnemes/snackquest # {"$imagepolicy": "flux-system:snackquest"}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

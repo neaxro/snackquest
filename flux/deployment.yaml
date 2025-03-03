@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snackquest
+  namespace: app-snackquest
+spec:
+  selector:
+    matchLabels:
+      app: snackquest
+  template:
+    metadata:
+      labels:
+        app: snackquest
+    spec:
+      containers:
+        - name: snackquest
+          image: axelnemes/snackquest # {"$imagepolicy": "app-snackquest:snackquest"}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP

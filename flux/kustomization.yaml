@@ -3,3 +3,5 @@ kind: Kustomization
 resources:
 - image-repository.yaml
 - image-policy.yaml
+- deployment.yaml
+- flux-system-automation.yaml

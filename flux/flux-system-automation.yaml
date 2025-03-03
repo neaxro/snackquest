@@ -1,0 +1,26 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageUpdateAutomation
+metadata:
+  name: snackquest
+  namespace: flux-system
+spec:
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: fluxbot@users.noreply.github.com
+        name: fluxbot
+      messageTemplate: '{{range .Changed.Changes}}{{print .OldValue}} -> {{println
+        .NewValue}}{{end}}'
+    push:
+      branch: release/production
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: snackquest
+  update:
+    path: flux
+    strategy: Setters

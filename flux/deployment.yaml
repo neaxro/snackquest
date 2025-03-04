@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snackquest
+  namespace: app-snackquest
+spec:
+  selector:
+    matchLabels:
+      app: snackquest
+  template:
+    metadata:
+      labels:
+        app: snackquest
+    spec:
+      containers:
+        - name: snackquest
+          image: axelnemes/snackquest:2025-01-29-e1095420625e27f11fb6b9227748d564269e5c3c # {"$imagepolicy": "flux-system:snackquest"}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP

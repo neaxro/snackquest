@@ -67,3 +67,54 @@ items:
 > If you do not want the snack to be calculated set the `available` attribute to `False`.
 
 > More menu item list examples in the `examples` folder.
+
+## Flux
+
+To add this app to flux, use the following command:
+
+> Do not forget to export `GITHUB_TOKEN` environment variable!
+> `export GITHUB_TOKEN=<app-repo-token>`
+
+Create Image repository
+
+```console
+flux create image repository snackquest-repo \
+    --image axelnemes/snackquest \
+    --interval 5m \
+    --export > ./flux/image-repository.yaml
+```
+
+Create Image policy
+
+```console
+flux create image policy snackquest \
+    --image-ref=snackquest-repo \
+    --select-alpha=asc \
+    --export > ./flux/image-policy.yaml
+```
+
+Create Image updater
+
+```console
+flux create image update snackquest \
+    --interval=5m \
+    --git-repo-ref=snackquest \
+    --git-repo-path=flux \
+    --checkout-branch=main \
+    --push-branch=main \
+    --author-name=fluxbot \
+    --author-email=fluxbot@users.noreply.github.com \
+    --commit-template="{{range .Changed.Changes}}{{print .OldValue}} -> {{println .NewValue}}{{end}}" \
+    --export > ./flux/flux-system-automation.yaml
+```
+
+### Workflow
+
+1. create `feature` branch and work on it.
+2. when feature is done, create a PR: `feature` -> `main`.
+   1. new image will be built.
+   2. new release will be created.
+3. if the new feature can go live, merge `main` -> `release/production`.
+   1. this need to be fast forward only, so the `main` and `release/production` branches should have the same commit history.
+   2. Flux only uses resources located on `release/production` branch.
+   3. image tag update will happen on `main`.

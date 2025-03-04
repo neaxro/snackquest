@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: snackquest-svc
+  namespace: app-snackquest
+spec:
+  selector:
+    app: snackquest
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: http

@@ -4,6 +4,7 @@ metadata:
   name: snackquest
   namespace: app-snackquest
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: snackquest
@@ -16,7 +17,39 @@ spec:
         - name: snackquest
           image: axelnemes/snackquest:2025-01-29-e1095420625e27f11fb6b9227748d564269e5c3c # {"$imagepolicy": "flux-system:snackquest"}
           imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
           ports:
             - name: http
               containerPort: 8000
               protocol: TCP
+
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: In
+                values:
+                - worker
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - rpw01
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - rpw02

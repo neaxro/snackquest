@@ -16,7 +16,7 @@ spec:
       messageTemplate: '{{range .Changed.Changes}}{{print .OldValue}} -> {{println
         .NewValue}}{{end}}'
     push:
-      branch: release/production
+      branch: main
   interval: 5m0s
   sourceRef:
     kind: GitRepository

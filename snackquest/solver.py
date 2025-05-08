@@ -1,71 +1,42 @@
 import pulp
 import beeprint as bprint
 
-from enum import Enum
 from rich.console import Console
 from rich.table import Table
 from rich.padding import Padding
 
-class TargetFunction(Enum):
-    MINIMALIZE_REMAINING_MONEY = "minremoney"
-    MAXIMIZE_CANDIES = "maxcandy"
-    
-def _minimalize_remaining_money(variables: dict, data, budget) -> pulp.LpProblem:
-    # Init problem
-    problem = pulp.LpProblem("MINIMALIZE_REMAINING_MONEY", pulp.LpMaximize)
-    # Define target function
-    problem += pulp.lpSum(variables[item['name']] * item['price'] for item in data['items'] if item['available'])
+
+def solve_problem(budget, data, print_menu=False, headless=False):
+    if print_menu:
+        bprint.pp(data)
+
+    problem = pulp.LpProblem("Maximize_Candies", pulp.LpMaximize)
+
+    # Init variables
+    variables = {}
+    for item in data['items']:
+        if item['available']:  # Use only the available candies.
+            variables[item['name']] = pulp.LpVariable(
+                item['name'], lowBound=0, cat='Integer'
+            )
+
+    # Target function: Maxminal candy count.
+    problem += pulp.lpSum(variables[item['name']] for item in data['items'] if item['available'])
+
     # Limit: Money
     problem += pulp.lpSum(
         variables[item['name']] * item['price']
         for item in data['items']
         if item['available']
     ) <= budget
+
     # Limit: Min count of specific candies.
     for item in data['items']:
         if item['available']:
             problem += variables[item['name']] >= item['desired']
-    
-    return problem
-
-def _maximize_candies(variables: dict, data, budget) -> pulp.LpProblem:
-    # Init problem
-    problem = pulp.LpProblem("MAXIMIZE_CANDIES", pulp.LpMaximize)
-    # Define target function
-    problem += pulp.lpSum(variables[item['name']] for item in data['items'] if item['available'])    # Limit: Money
-    problem += pulp.lpSum(
-        variables[item['name']] * item['price']
-        for item in data['items']
-        if item['available']
-    ) <= budget
-    # Limit: Min count of specific candies.
-    for item in data['items']:
-        if item['available']:
-            problem += variables[item['name']] >= item['desired']
-    
-    return problem
-
-def solve_problem(budget, data, target_funcion: TargetFunction, print_menu=False, headless=False):
-    if print_menu:
-        bprint.pp(data)    
-
-    # Use only the available candies.
-    variables = {}
-    for item in data['items']:
-        if item['available']:
-            variables[item['name']] = pulp.LpVariable(
-                item['name'], lowBound=0, cat='Integer'
-            )
-
-    # Create the problem based on the goal of the user.
-    if target_funcion == TargetFunction.MINIMALIZE_REMAINING_MONEY:
-        problem = _minimalize_remaining_money(variables, data, budget)
-        # problem.sense = pulp.LpMinimize
-    elif target_funcion == TargetFunction.MAXIMIZE_CANDIES:
-        problem = _maximize_candies(variables, data, budget)
 
     # Solve.
-    problem.solve(pulp.PULP_CBC_CMD(msg=False))
+    problem.solve()
 
     # Show results.
     if problem.status == pulp.LpStatusOptimal:

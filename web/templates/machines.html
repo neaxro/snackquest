@@ -23,16 +23,18 @@
 
 <body>
     {% include 'navbar.html' %}
-    {% if machines is defined and machines is not none %}
+
     <div class="container mt-4">
-    {% for machine in machines %}
-        <h2>{{ machine | replace(".yaml", "") }}</h2>
-        <textarea class="form-control mb-5" rows="30" readonly>
-        {%- include "machines/" ~ machine -%}
+        <h2>Pöttyös</h2>
+        <textarea class="form-control mb-5" id="pottyos" rows="30" readonly>
+        {%- include 'machines/pottyos.yaml' -%}
         </textarea>
-    {% endfor %}
+
+        <h2>Drinks</h2>
+        <textarea class="form-control mb-5" id="drinks" rows="20" readonly>
+        {%- include 'machines/drinks.yaml' -%}
+        </textarea>
     </div>
-    {% endif %}
 
     <script>
         localStorage.clear()

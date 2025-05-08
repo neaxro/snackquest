@@ -2,7 +2,7 @@ import argparse
 import sys
 import yaml
 
-from solver import solve_problem, TargetFunction
+from solver import solve_problem
 
 
 def _init_args():
@@ -13,7 +13,6 @@ def _init_args():
     )
     parser.add_argument("budget", help="The current budget of the card [default JMF]", type=int)
     parser.add_argument("menu", help="Vending machine's menu [.yml, .yaml]", type=argparse.FileType("r"))
-    parser.add_argument("targetFunction", help="The target function.", choices=["minremoney", "maxcandy"])
     parser.add_argument("-p", "--printMenu", dest="print_menu", action="store_true", help="Prints the menu")
     parser.add_argument("-o", "-out", dest="out_file", type=argparse.FileType("w", encoding="UTF-8"), help="The output file path")
     
@@ -29,18 +28,12 @@ def main():
     if args.menu is None:
         print("Menu list path was not given!")
         sys.exit(1)
-
-    if args.targetFunction is None:
-        print("targetFunction was not given!")
-        sys.exit(1)
-
+        
     if args.out_file is not None:
         sys.stdout = args.out_file
 
-    target_function = TargetFunction(args.targetFunction)
-    
     # Solve problem.
-    solve_problem(args.budget, yaml.safe_load(args.menu), target_function, args.print_menu)
+    solve_problem(args.budget, yaml.safe_load(args.menu), args.print_menu)
 
 if __name__ == "__main__":
     main()

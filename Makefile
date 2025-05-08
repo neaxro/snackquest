@@ -9,3 +9,12 @@ packages:	# Install python dependencies
 .PHONY: web
 web:	# Start webpage locally in debug mode
 	python -m web.app
+
+.PHONY: build
+build:	# Start webpage locally in debug mode
+	docker build -t snackquest:local .
+
+.PHONY: up
+up:	# Start webpage locally in debug mode
+	docker rm snackquest && \
+	docker run --name snackquest -p 5000:8000 snackquest:local

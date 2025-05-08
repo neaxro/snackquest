@@ -1,7 +1,11 @@
 import yaml
+import os
+import logging
 
 from flask import Flask, render_template, request
 from snackquest.solver import solve_problem, TargetFunction
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
@@ -29,7 +33,8 @@ def home():
 
 @app.route("/machines")
 def machines():
-    return render_template("machines.html")
+    machines = os.listdir("./web/templates/machines/")
+    return render_template("machines.html", machines=machines)
 
 if __name__ == "__main__":
     app.run(

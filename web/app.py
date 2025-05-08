@@ -1,7 +1,7 @@
 import yaml
 
 from flask import Flask, render_template, request
-from snackquest.solver import solve_problem
+from snackquest.solver import solve_problem, TargetFunction
 
 app = Flask(__name__)
 
@@ -10,9 +10,10 @@ def calculator():
     if request.form:
         try:
             budget = int(request.form.get("budget"))
+            target_function = TargetFunction(str(request.form.get("targetFunction")))
             menu = yaml.safe_load(request.form.get("menu"))
             
-            result = solve_problem(budget, menu, headless=True)
+            result = solve_problem(budget, menu, target_function, headless=True)
             print(result)
 
             return render_template("calculator.html", result=result)

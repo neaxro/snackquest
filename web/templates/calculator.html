@@ -23,10 +23,21 @@
     <h1 class="mb-4 mt-4">Calculator</h1>
 
     <form id="calculator" action="/calculator" method="post" class="mb-5">
-      <div class="mb-3">
-        <label for="budget" class="form-label">Budget</label>
-        <input type="number" class="form-control" id="budget" name="budget" placeholder="2500" required>
-        <div class="invalid-feedback">Please provide a valid budget amount.</div>
+      <div class="row">
+        <div class="col">
+          <label for="budget" class="form-label">Budget</label>
+          <input type="number" class="form-control" id="budget" name="budget" placeholder="2500" min="0" max="15000" required>
+          <div class="invalid-feedback">Please provide a valid budget amount.</div>
+        </div>
+
+        <div class="col">
+          <label for="targetFunction" class="form-label">Target Function</label>
+          <select id="targetFunction" name="targetFunction" class="form-select" aria-label="Default select example">
+            <option selected value="minremoney">Minimalize Remaining Money</option>
+            <option value="maxcandy">Maximize Candy</option>
+          </select>
+        </div>
+
       </div>
 
       <div class="mb-3">

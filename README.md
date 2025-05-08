@@ -27,30 +27,60 @@ python3 snackquest.py budget menu.yaml
 ```
 Example how to calculate best order list:
 ```sh
-python3 snackquest/snackquest.py 1300 examples/example01.yaml
+python3 snackquest/snackquest.py 1300 examples/example01.yaml minremoney
 ```
-Output:
+### :chart_with_upwards_trend: Strategy: minremoney
+
+With the `minremoney` strategy snackquest aims to spend as much of your budget as possible, minimizing the amount of money left unspent in the machine.
+
 ```sh
-user@ubuntu:~/snackquest$ python3 snackquest/snackquest.py 2300 examples/example01.yaml
+user@ubuntu:~/snackquest$ python3 snackquest/snackquest.py 5700 examples/example01.yaml minremoney
+
+         The Optimal Solution          
+┏━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ Snack Options  ┃ Count ┃ Unit price ┃
+┡━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ Snickers       │ 3     │        300 │
+│ Twix           │ 0     │        280 │
+│ Bounty         │ 15    │        320 │
+│ Mars           │ 0     │        290 │
+├────────────────┼───────┼────────────┤
+│ Total          │ 18    │       5700 │
+│ Remaining      │       │          0 │
+├────────────────┼───────┼────────────┤
+│ Initial budget │       │       5700 │
+└────────────────┴───────┴────────────┘
+         Initial budget: 5700
+
+user@ubuntu:~/snackquest$
+```
+
+### :chart_with_upwards_trend: Strategy: maxcandy
+
+With the `maxcandy` strategy, snackquest tries to maximize the number of candies you can buy within your budget, regardless of how much money remains unspent.
+
+```sh
+user@ubuntu:~/snackquest$ python3 snackquest/snackquest.py 5700 examples/example01.yaml maxcandy
 
          The Optimal Solution          
 ┏━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Snack Options  ┃ Count ┃ Unit price ┃
 ┡━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
 │ Snickers       │ 0     │        300 │
-│ Twix           │ 8     │        280 │
+│ Twix           │ 20    │        280 │
 │ Bounty         │ 0     │        320 │
 │ Mars           │ 0     │        290 │
 ├────────────────┼───────┼────────────┤
-│ Total          │ 8     │       2240 │
-│ Remaining      │       │         60 │
+│ Total          │ 20    │       5600 │
+│ Remaining      │       │        100 │
 ├────────────────┼───────┼────────────┤
-│ Initial budget │       │       2300 │
+│ Initial budget │       │       5700 │
 └────────────────┴───────┴────────────┘
-         Initial budget: 2300
+         Initial budget: 5700          
 
 user@ubuntu:~/snackquest$
 ```
+
 ## :bookmark_tabs: Menu file
 The program needs a menu file which contains all of the Candy Machine information. The only valid formatum is **.yaml/yml**.
 

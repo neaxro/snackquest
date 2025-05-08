@@ -65,7 +65,7 @@ def solve_problem(budget, data, target_funcion: TargetFunction, print_menu=False
         problem = _maximize_candies(variables, data, budget)
 
     # Solve.
-    problem.solve()
+    problem.solve(pulp.PULP_CBC_CMD(msg=False))
 
     # Show results.
     if problem.status == pulp.LpStatusOptimal:

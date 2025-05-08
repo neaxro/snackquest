@@ -23,16 +23,38 @@
     <h1 class="mb-4 mt-4">Calculator</h1>
 
     <form id="calculator" action="/calculator" method="post" class="mb-5">
-      <div class="mb-3">
-        <label for="budget" class="form-label">Budget</label>
-        <input type="number" class="form-control" id="budget" name="budget" placeholder="2500" required>
-        <div class="invalid-feedback">Please provide a valid budget amount.</div>
+      <div class="row">
+        <div class="col-md-4">
+          <label for="budget" class="form-label">Budget</label>
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">JMF</span>
+            <input aria-describedby="basic-addon1" type="number" class="form-control" id="budget" name="budget" placeholder="2500" min="0" max="15000" required>
+          </div>
+          <div class="invalid-feedback">Please provide a valid budget amount.</div>
+        </div>
+
+        <div class="col-md-4">
+          <label for="targetFunction" class="form-label">Target Function</label>
+          <select id="targetFunction" name="targetFunction" class="form-select" aria-label="Default select example">
+            <option value="minremoney">Minimalize Remaining Money</option>
+            <option value="maxcandy">Maximize Candy</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="machineFile" class="form-label">Machine</label>
+          <select id="machineFile" name="machineFile" class="form-select" aria-label="Default select example">
+            {% for machine in machines %}
+            <option value={{ machine }}>{{ machine | replace(".yaml", "") }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
       </div>
 
       <div class="mb-3">
-        <label for="menu" class="form-label">Paste menu file</label>
-        <textarea class="form-control" id="menu" name="menu" rows="15"
-          placeholder="{% include 'yaml_placeholder.yaml' %}" required></textarea>
+        <label for="menu" class="form-label">Paste or edit menu file</label>
+        <textarea class="form-control" id="menu" name="menu" rows="15" required></textarea>
         <div id="errorMessage" class="error mt-2"></div>
         <div class="invalid-feedback">Invalid YAML syntax. Please fix it to enable the submission.</div>
       </div>
@@ -99,6 +121,27 @@
         }
       }
 
+      function loadMachine() {
+        if (document.getElementById("menu").value != "") return;
+
+        var selectedFile = document.getElementById("machineFile").value;
+        fetch(`/machines/${selectedFile}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("File not found or cannot be loaded");
+            }
+            return response.text();
+          })
+          .then(data => {
+            document.getElementById("menu").value = data;
+          })
+          .catch(error => {
+            document.getElementById("menu").value = "";
+            console.error(error);
+            alert("Error loading file content.");
+          });
+      }
+
       menu.addEventListener('input', () => {
         const content = menu.value;
         validateYAML(content);
@@ -127,7 +170,28 @@
       });
 
       getData();
+      loadMachine()
       validateYAML(menu.value);
+
+      document.getElementById("machineFile").addEventListener("change", function () {
+        const selectedFile = this.value;
+
+        fetch(`/machines/${selectedFile}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("File not found or cannot be loaded");
+            }
+            return response.text();
+          })
+          .then(data => {
+            document.getElementById("menu").value = data;
+          })
+          .catch(error => {
+            document.getElementById("menu").value = "";
+            console.error(error);
+            alert("Error loading file content.");
+          });
+      });
     </script>
 
   </div>

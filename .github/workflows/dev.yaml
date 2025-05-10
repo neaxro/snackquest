@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       build_time: ${{ steps.date.outputs.date }}
-      build_environment: ${{ steps.environment.outputs.build_environment }}
     steps:
       - id: date
         name: Get current date

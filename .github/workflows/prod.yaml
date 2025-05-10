@@ -1,5 +1,5 @@
 name: "[PROD] Build and Push"
-run-name: "Build and Push: ${{ github.sha }}"
+run-name: "[PROD] Build and Push: ${{ github.sha }}"
 
 on:
   pull_request_target:

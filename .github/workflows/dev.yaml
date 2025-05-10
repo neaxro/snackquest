@@ -7,18 +7,7 @@ on:
       - dev
 
 jobs:
-  gather-informations:
-    runs-on: ubuntu-latest
-    outputs:
-      build_time: ${{ steps.date.outputs.date }}
-    steps:
-      - id: date
-        name: Get current date
-        run: echo "date=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
-
-  docker:
-    needs:
-      - gather-informations
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Login to Docker Hub
@@ -37,5 +26,5 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: axelnemes/snackquest:$dev-{{ needs.gather-informations.outputs.build_time }}-${{ github.sha }}
+          tags: axelnemes/snackquest:$dev-${{ github.sha }}
           platforms: linux/arm64, linux/amd64

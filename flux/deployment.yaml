@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: snackquest
-          image: axelnemes/snackquest:latest # {"$imagepolicy": "flux-system:snackquest"}
+          image: axelnemes/snackquest:2025-05-08-6831e55805f14d07be7e46ce33ac541ed5b2f005
           imagePullPolicy: IfNotPresent
           resources:
             requests:

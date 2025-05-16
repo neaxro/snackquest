@@ -1,0 +1,27 @@
+# Last updated: 2025.01.24.
+---
+items:
+  - name: Snickers
+    price: 300
+    desired: 0
+    available: True
+
+  - name: Twix
+    price: 280
+    desired: 0
+    available: True
+
+  - name: Bounty
+    price: 320
+    desired: 0
+    available: True
+
+  - name: Kinder Bueno
+    price: 340
+    desired: 0
+    available: False
+
+  - name: Mars
+    price: 290
+    desired: 0
+    available: True

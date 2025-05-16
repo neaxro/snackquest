@@ -1,0 +1,17 @@
+# Last updated: 2025.01.24.
+---
+items:
+  - name: Sprite
+    price: 300
+    desired: 0
+    available: True
+
+  - name: Cola
+    price: 280
+    desired: 0
+    available: True
+
+  - name: Fanta
+    price: 320
+    desired: 0
+    available: True

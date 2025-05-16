@@ -63,6 +63,8 @@ def solve_problem(budget, data, target_funcion: TargetFunction, print_menu=False
         # problem.sense = pulp.LpMinimize
     elif target_funcion == TargetFunction.MAXIMIZE_CANDIES:
         problem = _maximize_candies(variables, data, budget)
+    else:
+        raise ValueError(f"Unknown target function: {target_funcion}")
 
     # Solve.
     problem.solve(pulp.PULP_CBC_CMD(msg=False))
@@ -100,6 +102,7 @@ def solve_problem(budget, data, target_funcion: TargetFunction, print_menu=False
         }
     else:
         print("No solution found.")
+        return None
 
 def _print_solution(budget, final_items, total_candies, total_cost):
     console = Console()

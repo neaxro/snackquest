@@ -1,0 +1,12 @@
+services:
+  api:
+    image: snackquest-api:local
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - ./examples:/machines:ro
+    environment:
+      MACHINE_INVENTORY_PATH: "/machines"

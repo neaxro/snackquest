@@ -10,3 +10,9 @@ services:
       - ./examples:/machines:ro
     environment:
       MACHINE_INVENTORY_PATH: "/machines"
+      APP_HOST: 0.0.0.0
+      APP_PORT: 5000
+      APP_DEBUG: False
+      METRICS_PREFIX: snackquest
+      METRICS_APP_NAME: snackquest
+      TIMEZONE: Europe/Budapest

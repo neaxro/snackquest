@@ -1,7 +1,7 @@
 import time
 from functools import wraps
 
-from flask import request
+from flask import request, make_response
 from prometheus_client import Counter, Summary
 from api.utils.config import Config
 
@@ -20,7 +20,7 @@ class Metrics:
         self.REQUEST_COUNT = Counter(
             f"{config.METRICS_PREFIX}_request_count",
             "Number of requests",
-            ["method", "endpoint", "service"],
+            ["method", "endpoint", "service", "status"],
         )
         self.REQUEST_TIME = Summary(
             f"{config.METRICS_PREFIX}_request_time",
@@ -40,14 +40,21 @@ metrics = Metrics()
 def count_requests(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        response = func(*args, **kwargs)
+        response_obj = make_response(response)
+        status_code = response_obj.status_code
+
         metrics.REQUEST_COUNT.labels(
             method=request.method,
             endpoint=request.endpoint,
             service=metrics.service_name,
-        ).inc()  # Increment request count
-        return func(*args, **kwargs)
+            status=str(status_code),
+        ).inc()
+
+        return response
 
     return wrapper
+
 
 
 def time_request(func):

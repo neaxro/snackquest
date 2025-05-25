@@ -1,5 +1,5 @@
 services:
-  api:
+  backend:
     image: snackquest-api:local
     build:
       context: .
@@ -8,6 +8,8 @@ services:
       - 5000:5000
     volumes:
       - ./examples:/machines:ro
+    tmpfs:
+      - /metrics
     environment:
       MACHINE_INVENTORY_PATH: "/machines"
       APP_HOST: 0.0.0.0
@@ -16,3 +18,52 @@ services:
       METRICS_PREFIX: snackquest
       METRICS_APP_NAME: snackquest
       TIMEZONE: Europe/Budapest
+      PROMETHEUS_MULTIPROC_DIR: /metrics
+
+  prometheus:
+    image: prom/prometheus:v3.4.0
+    restart: always
+    ports:
+      - 9090:9090
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.time=1h'  # Keep data for only 1 hour
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:9090/-/ready"]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:12.0.0
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=pass
+    configs:
+      - source: grafana_datasources_config
+        target: /etc/grafana/provisioning/datasources/datasource.yaml
+      - source: grafana_dashboard_provisioner
+        target: /etc/grafana/provisioning/dashboards/main.yaml
+      - source: grafana_backend_dashboard
+        target: /var/lib/grafana/dashboards/backend.json
+    ports:
+      - 3000:3000
+    depends_on:
+      prometheus:
+        condition: service_healthy
+
+configs:
+  prometheus_config:
+    file: ./monitoring/prometheus.yaml
+  grafana_datasources_config:
+    file: ./monitoring/grafana_datasources.yaml
+  grafana_dashboard_provisioner:
+    file: ./monitoring/grafana_dashboard_provisioner.yaml
+  grafana_backend_dashboard:
+    file: ./monitoring/grafana_dashboard.json

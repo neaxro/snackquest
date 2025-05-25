@@ -4,13 +4,25 @@ import json
 import logging
 
 from flask import Flask, jsonify, request
-from prometheus_client import make_wsgi_app
+from prometheus_client import CollectorRegistry, multiprocess, generate_latest, CONTENT_TYPE_LATEST
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from cli.solver import solve_problem, TargetFunction
 from api.utils.config import config
 from api.utils.metrics import count_requests, latency_request, time_request
 from api.utils.logging_config import setup_logger
 
+def create_metrics_app():
+    registry = CollectorRegistry()
+    multiprocess.MultiProcessCollector(registry)
+
+    def prometheus_wsgi(environ, start_response):
+        data = generate_latest(registry)
+        status = '200 OK'
+        headers = [('Content-type', CONTENT_TYPE_LATEST)]
+        start_response(status, headers)
+        return [data]
+
+    return prometheus_wsgi
 
 def setup_app():
     app = Flask(__name__)
@@ -19,7 +31,7 @@ def setup_app():
     app.logger.setLevel(logging.INFO)
     setup_logger(app)
     
-    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": create_metrics_app()})
     
     return app, app.logger
 

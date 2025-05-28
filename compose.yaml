@@ -19,6 +19,7 @@ services:
       METRICS_APP_NAME: snackquest
       TIMEZONE: Europe/Budapest
       PROMETHEUS_MULTIPROC_DIR: /metrics
+      CORS_ORIGINS: "http://localhost:3000"
 
   prometheus:
     image: prom/prometheus:v3.4.0
@@ -26,15 +27,16 @@ services:
     ports:
       - 9090:9090
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.enable-lifecycle'
-      - '--storage.tsdb.retention.time=1h'  # Keep data for only 1 hour
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+      - "--storage.tsdb.retention.time=1h" # Keep data for only 1 hour
     configs:
       - source: prometheus_config
         target: /etc/prometheus/prometheus.yml
     healthcheck:
-      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:9090/-/ready"]
+      test:
+        ["CMD", "wget", "--spider", "--quiet", "http://localhost:9090/-/ready"]
       interval: 5s
       timeout: 60s
       retries: 5
@@ -53,7 +55,7 @@ services:
       - source: grafana_backend_dashboard
         target: /var/lib/grafana/dashboards/backend.json
     ports:
-      - 3000:3000
+      - 3001:3000
     depends_on:
       prometheus:
         condition: service_healthy

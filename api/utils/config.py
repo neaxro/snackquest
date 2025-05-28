@@ -10,6 +10,7 @@ class Config:
         self.MACHINE_INVENTORY_PATH = os.getenv("MACHINE_INVENTORY_PATH", "api/machines")
         self.TIMEZONE = os.getenv("TIMEZONE", "UTC")
         self.DEBUG_LEVEL = os.getenv("DEBUG_LEVEL", "info")
+        self.CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
 
         # Metrics related config
         self.METRICS_PREFIX = os.getenv("METRICS_PREFIX", "snackquest")

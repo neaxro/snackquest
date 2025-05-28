@@ -4,6 +4,7 @@ import json
 import logging
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from prometheus_client import CollectorRegistry, multiprocess, generate_latest, CONTENT_TYPE_LATEST
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from cli.solver import solve_problem, TargetFunction
@@ -26,6 +27,7 @@ def create_metrics_app():
 
 def setup_app():
     app = Flask(__name__)
+    CORS(app, origins=config.CORS_ORIGINS.split(","))
     
     logging.basicConfig(level=logging.INFO)
     app.logger.setLevel(logging.INFO)

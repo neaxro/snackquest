@@ -14,6 +14,8 @@ function CalculatorPage() {
   );
   const [snacks, setSnacks] = useState([]);
   const [selectedSnacks, setSelectedSnacks] = useState<Snack[]>([]);
+  const [validated, setValidated] = useState(false);
+  const [snacksValid, setSnacksValid] = useState(true);
 
   useEffect(() => {
     getMachines()
@@ -81,22 +83,42 @@ function CalculatorPage() {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    console.log("Submit pressed with:", {
-      selectedSnacks,
-      selectedTargetFunction,
-      selectedMachine,
-    });
+    const form = event.currentTarget as HTMLFormElement;
+
+    const isSnacksValid = selectedSnacks.length > 0;
+    setSnacksValid(isSnacksValid);
+
+    if (form.checkValidity() === false || !isSnacksValid) {
+      event.stopPropagation();
+    } else {
+      console.log("Submit pressed with:", {
+        selectedSnacks,
+        selectedTargetFunction,
+        selectedMachine,
+      });
+    }
+
+    setValidated(true);
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form noValidate validated={validated} onSubmit={handleSubmit}>
       <Row>
         <Col className="col-12 col-md-6 col-xl-4">
           <Form.Group className="mb-3" controlId="budget">
             <Form.Label>Budget</Form.Label>
             <InputGroup>
               <InputGroup.Text id="basic-addon1">JMF</InputGroup.Text>
-              <Form.Control type="number" min={0} max={15000} step={0} />
+              <Form.Control
+                required
+                type="number"
+                min={0}
+                max={15000}
+                step={0}
+              />
+              <Form.Control.Feedback type="invalid">
+                Please provide your balance. (max 15000)
+              </Form.Control.Feedback>
             </InputGroup>
           </Form.Group>
         </Col>
@@ -141,17 +163,29 @@ function CalculatorPage() {
         </Col>
       </Row>
 
-      <h5 className="mt-4">Available snacks</h5>
-      <p>Only selected snacks will be included in the calculation.</p>
-      <Stack gap={3} direction="horizontal" className="col-12 flex-wrap">
-        {snacks.map((snack: Snack, index) => (
-          <ToggleSnackButton
-            key={index}
-            snack={snack}
-            onToggleChanged={(selected) => handleToggleChange(snack, selected)}
-          />
-        ))}
-      </Stack>
+      <Form.Group className="mb-3" controlId="snacks_selection">
+        <Form.Label>
+          <h5>Available snacks</h5>
+        </Form.Label>
+        <p>Only selected snacks will be included in the calculation.</p>
+        <Stack gap={3} direction="horizontal" className="col-12 flex-wrap">
+          {snacks.map((snack: Snack, index) => (
+            <ToggleSnackButton
+              key={index}
+              snack={snack}
+              onToggleChanged={(selected) =>
+                handleToggleChange(snack, selected)
+              }
+            />
+          ))}
+        </Stack>
+
+        {!snacksValid && validated && (
+          <div className="text-danger mt-1">
+            Please select at least one snack to proceed.
+          </div>
+        )}
+      </Form.Group>
 
       <h5 className="mt-4">Selected snacks</h5>
       <Stack gap={2} direction="horizontal" className="flex-wrap col-12">

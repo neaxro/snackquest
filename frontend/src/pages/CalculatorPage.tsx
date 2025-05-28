@@ -1,12 +1,20 @@
 import { Form, Row, Col, InputGroup, Stack, Button } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { getMachines, getInventory } from "../services/SnackquestApi";
+import {
+  getMachines,
+  getInventory,
+  calculate,
+} from "../services/SnackquestApi";
 import { availableTargetFunctions } from "../types/TargetFunction";
 import { Snack } from "../types/Snack";
 import ToggleSnackButton from "../components/calculator/ToggleSnackButton";
 import SnackCard from "../components/calculator/SnackCard";
+import { CalculateResult } from "../types/CalculateResult";
+import ResultTable from "../components/calculator/ResultTable";
+import { AxiosResponse } from "axios";
 
 function CalculatorPage() {
+  const [budget, setBudget] = useState<number>(2500);
   const [machines, setMachines] = useState([]);
   const [selectedMachine, setSelectedMachine] = useState(machines[0]);
   const [selectedTargetFunction, setSelectedTargetFunction] = useState(
@@ -16,6 +24,9 @@ function CalculatorPage() {
   const [selectedSnacks, setSelectedSnacks] = useState<Snack[]>([]);
   const [validated, setValidated] = useState(false);
   const [snacksValid, setSnacksValid] = useState(true);
+  const [response, setResponse] = useState<AxiosResponse | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     getMachines()
@@ -30,11 +41,13 @@ function CalculatorPage() {
   }, []);
 
   const loadInventory = (machineName: string) => {
-    getInventory(machineName).then((res) => {
-      console.log(res);
-      const fetched_snacks = res.data;
-      setSnacks(fetched_snacks["items"]);
-    });
+    getInventory(machineName)
+      .then((res) => {
+        console.log(res);
+        const fetched_snacks = res.data;
+        setSnacks(fetched_snacks["items"]);
+      })
+      .catch((error) => console.log(error));
   };
 
   const handleMachineChange: React.ChangeEventHandler<HTMLSelectElement> = (
@@ -92,123 +105,147 @@ function CalculatorPage() {
       event.stopPropagation();
     } else {
       console.log("Submit pressed with:", {
+        budget,
         selectedSnacks,
         selectedTargetFunction,
         selectedMachine,
       });
+
+      calculate(budget, selectedTargetFunction, selectedMachine, selectedSnacks)
+        .then((res) => {
+          console.log(res);
+          setResponse(res);
+        })
+        .catch((error) => console.log(error));
     }
 
     setValidated(true);
   };
 
   return (
-    <Form noValidate validated={validated} onSubmit={handleSubmit}>
-      <Row>
-        <Col className="col-12 col-md-6 col-xl-4">
-          <Form.Group className="mb-3" controlId="budget">
-            <Form.Label>Budget</Form.Label>
-            <InputGroup>
-              <InputGroup.Text id="basic-addon1">JMF</InputGroup.Text>
-              <Form.Control
-                required
-                type="number"
-                min={0}
-                max={15000}
-                step={0}
-              />
-              <Form.Control.Feedback type="invalid">
-                Please provide your balance. (max 15000)
-              </Form.Control.Feedback>
-            </InputGroup>
-          </Form.Group>
-        </Col>
+    <>
+      <Form
+        noValidate
+        validated={validated}
+        onSubmit={handleSubmit}
+        className="mb-5"
+      >
+        <Row>
+          <Col className="col-12 col-md-6 col-xl-4">
+            <Form.Group className="mb-3" controlId="budget">
+              <Form.Label>Budget</Form.Label>
+              <InputGroup>
+                <InputGroup.Text id="basic-addon1">JMF</InputGroup.Text>
+                <Form.Control
+                  required
+                  type="number"
+                  min={0}
+                  max={15000}
+                  step={0}
+                  value={budget}
+                  onChange={(e) => {
+                    const input = e.target as HTMLInputElement;
+                    setBudget(input.valueAsNumber);
+                  }}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Please provide your balance. (max 15000)
+                </Form.Control.Feedback>
+              </InputGroup>
+            </Form.Group>
+          </Col>
 
-        <Col className="col-12 col-md-6 col-xl-4">
-          <Form.Group className="mb-3" controlId="target_function">
-            <Form.Label>Target function</Form.Label>
-            <InputGroup>
+          <Col className="col-12 col-md-6 col-xl-4">
+            <Form.Group className="mb-3" controlId="target_function">
+              <Form.Label>Target function</Form.Label>
+              <InputGroup>
+                <Form.Select
+                  aria-label="Floating label select example"
+                  onChange={handleTargetFunctionChange}
+                  value={selectedTargetFunction.param_name}
+                >
+                  {availableTargetFunctions.map((tf) => (
+                    <option key={tf.param_name} value={tf.param_name}>
+                      {tf.display_name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </InputGroup>
+              <Form.Text className="text-muted">
+                {selectedTargetFunction.description}
+              </Form.Text>
+            </Form.Group>
+          </Col>
+
+          <Col className="col-12 col-md-6 col-xl-4">
+            <Form.Group className="mb-3" controlId="machine_name">
+              <Form.Label>Machine</Form.Label>
               <Form.Select
                 aria-label="Floating label select example"
-                onChange={handleTargetFunctionChange}
-                value={selectedTargetFunction.param_name}
+                onChange={handleMachineChange}
+                value={selectedMachine}
               >
-                {availableTargetFunctions.map((tf) => (
-                  <option key={tf.param_name} value={tf.param_name}>
-                    {tf.display_name}
+                {machines.map((machine) => (
+                  <option key={machine} value={machine}>
+                    {machine}
                   </option>
                 ))}
               </Form.Select>
-            </InputGroup>
-            <Form.Text className="text-muted">
-              {selectedTargetFunction.description}
-            </Form.Text>
-          </Form.Group>
-        </Col>
+            </Form.Group>
+          </Col>
+        </Row>
 
-        <Col className="col-12 col-md-6 col-xl-4">
-          <Form.Group className="mb-3" controlId="machine_name">
-            <Form.Label>Machine</Form.Label>
-            <Form.Select
-              aria-label="Floating label select example"
-              onChange={handleMachineChange}
-              value={selectedMachine}
-            >
-              {machines.map((machine) => (
-                <option key={machine} value={machine}>
-                  {machine}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        </Col>
-      </Row>
+        <Form.Group className="mb-3" controlId="snacks_selection">
+          <Form.Label>
+            <h5>Available snacks</h5>
+          </Form.Label>
+          <p>Only selected snacks will be included in the calculation.</p>
+          <Stack gap={3} direction="horizontal" className="col-12 flex-wrap">
+            {snacks.map((snack: Snack, index) => (
+              <ToggleSnackButton
+                key={index}
+                snack={snack}
+                onToggleChanged={(selected) =>
+                  handleToggleChange(snack, selected)
+                }
+              />
+            ))}
+          </Stack>
 
-      <Form.Group className="mb-3" controlId="snacks_selection">
-        <Form.Label>
-          <h5>Available snacks</h5>
-        </Form.Label>
-        <p>Only selected snacks will be included in the calculation.</p>
-        <Stack gap={3} direction="horizontal" className="col-12 flex-wrap">
-          {snacks.map((snack: Snack, index) => (
-            <ToggleSnackButton
-              key={index}
+          {!snacksValid && validated && (
+            <div className="text-danger mt-1">
+              Please select at least one snack to proceed.
+            </div>
+          )}
+        </Form.Group>
+
+        <h5 className="mt-4">Selected snacks</h5>
+        <Stack gap={2} direction="horizontal" className="flex-wrap col-12">
+          {selectedSnacks.map((snack, index) => (
+            <SnackCard
+              key={snack.name}
               snack={snack}
-              onToggleChanged={(selected) =>
-                handleToggleChange(snack, selected)
+              onDesiredChange={(newDesired) =>
+                updateSnackDesired(index, newDesired)
               }
             />
           ))}
         </Stack>
 
-        {!snacksValid && validated && (
-          <div className="text-danger mt-1">
-            Please select at least one snack to proceed.
-          </div>
-        )}
-      </Form.Group>
+        <Button
+          className="mt-5"
+          variant="primary"
+          type="submit"
+          disabled={selectedSnacks.length === 0}
+        >
+          Calculate
+        </Button>
+      </Form>
 
-      <h5 className="mt-4">Selected snacks</h5>
-      <Stack gap={2} direction="horizontal" className="flex-wrap col-12">
-        {selectedSnacks.map((snack, index) => (
-          <SnackCard
-            key={snack.name}
-            snack={snack}
-            onDesiredChange={(newDesired) =>
-              updateSnackDesired(index, newDesired)
-            }
-          />
-        ))}
-      </Stack>
-
-      <Button
-        className="mt-5"
-        variant="primary"
-        type="submit"
-        disabled={selectedSnacks.length === 0}
-      >
-        Calculate
-      </Button>
-    </Form>
+      {response && (
+        <ResultTable result={response.data} statusCode={response.status} />
+      )}
+    </>
   );
 }
 

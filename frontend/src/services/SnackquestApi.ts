@@ -2,7 +2,7 @@ import axios from "axios";
 import { Snack } from "../types/Snack";
 import { TargetFunction } from "../types/TargetFunction";
 
-const base_url = "http://localhost:5000"
+const base_url = process.env.REACT_APP_BACKEND_URL;
 
 export function getMachines(){
     const endpoint = `${base_url}/machines`;

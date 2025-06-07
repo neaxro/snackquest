@@ -16,4 +16,4 @@ USER snackquester
 
 EXPOSE 5000/tcp
 
-ENTRYPOINT [ "gunicorn", "-w 2", "-b 0.0.0.0:5000", "api.app:app" ]
+ENTRYPOINT [ "gunicorn", "-w 1", "-b 0.0.0.0:5000", "api.app:app" ]

@@ -1,27 +1,75 @@
-# Last updated: 2025.01.24.
+# 2025.05.21.
 ---
 items:
-  - name: Snickers
-    price: 300
-    desired: 0
-    available: True
-
-  - name: Twix
-    price: 280
-    desired: 0
-    available: True
-
-  - name: Bounty
-    price: 320
-    desired: 0
-    available: True
-
-  - name: Kinder Bueno
-    price: 340
-    desired: 0
-    available: False
-
-  - name: Mars
-    price: 290
-    desired: 0
-    available: True
+- name: "Kakaó (0% cukor)"
+  price: 530
+  desired: 1
+  available: True
+- name: "Kakaó"
+  price: 530
+  desired: 1
+  available: True
+- name: "Milli jegeskávé"
+  price: 530
+  desired: 1
+  available: True
+- name: "Madártej"
+  price: 530
+  desired: 1
+  available: True
+- name: "Milli jegeskávé (0% cukor)"
+  price: 530
+  desired: 1
+  available: True
+- name: "Túrórudi (0% cukor)"
+  price: 360
+  desired: 1
+  available: True
+- name: "Guru citromkrémes (0% cukor)"
+  price: 360
+  desired: 1
+  available: True
+- name: "Túrórudi brownie (0% cukor)"
+  price: 360
+  desired: 1
+  available: True
+- name: "Túrórudi protein málnás"
+  price: 400
+  desired: 1
+  available: True
+- name: "Túrórudi tejes (óriás)"
+  price: 360
+  desired: 1
+  available: True
+- name: "Túrórudi protein natúr (óriás)"
+  price: 400
+  desired: 1
+  available: True
+- name: "Túrórudi natúr (óriás)"
+  price: 360
+  desired: 1
+  available: True
+- name: "Túrórudi mogyorókrémes (óriás)"
+  price: 360
+  desired: 1
+  available: True
+- name: "Túrórudi madártejes (óriás)"
+  price: 360
+  desired: 1
+  available: True
+- name: "Tejsüti megacsoki"
+  price: 270
+  desired: 1
+  available: True
+- name: "Tejsüti tejes"
+  price: 270
+  desired: 1
+  available: True
+- name: "Guru karamell"
+  price: 360
+  desired: 1
+  available: True
+- name: "Tejsüti (0% cukor)"
+  price: 270
+  desired: 1
+  available: True

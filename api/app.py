@@ -5,44 +5,39 @@ import logging
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from prometheus_client import CollectorRegistry, multiprocess, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import make_wsgi_app
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from cli.solver import solve_problem, TargetFunction
 from api.utils.config import config
 from api.utils.metrics import count_requests, latency_request, time_request
 from api.utils.logging_config import setup_logger
 
-def create_metrics_app():
-    registry = CollectorRegistry()
-    multiprocess.MultiProcessCollector(registry)
-
-    def prometheus_wsgi(environ, start_response):
-        data = generate_latest(registry)
-        status = '200 OK'
-        headers = [('Content-type', CONTENT_TYPE_LATEST)]
-        start_response(status, headers)
-        return [data]
-
-    return prometheus_wsgi
-
 def setup_app():
     app = Flask(__name__)
-    CORS(app, origins=config.CORS_ORIGINS.split(","))
-    
+
     logging.basicConfig(level=logging.INFO)
     app.logger.setLevel(logging.INFO)
     setup_logger(app)
+
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {'/metrics': make_wsgi_app()})
+
+    cors_origins = config.CORS_ORIGINS.split(',') if config.CORS_ORIGINS else "*"
     
-    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": create_metrics_app()})
+    CORS(app,
+         resources={r"/*": {"origins": cors_origins}},
+         supports_credentials=True,
+         allow_headers="*",
+         methods=["GET", "POST", "OPTIONS"])
+
+    app.logger.info(f"Running with CORS Origins: {cors_origins}")
     
     return app, app.logger
+
 
 app, logger = setup_app()
 
 
-@app.get(
-    "/machines/<name>"
-)
+@app.route("/machines/<name>", methods=["GET"])
 @latency_request
 @count_requests
 @time_request
@@ -68,9 +63,7 @@ def get_machine_inventory(name):
         }, 500
 
 
-@app.get(
-    "/machines"
-)
+@app.route("/machines", methods=["GET"])
 @latency_request
 @count_requests
 @time_request
@@ -86,9 +79,7 @@ def get_machines():
             "error": str(e)
         }, 500
 
-@app.post(
-    "/solve"
-)
+@app.route("/solve", methods=["POST"])
 @latency_request
 @count_requests
 @time_request

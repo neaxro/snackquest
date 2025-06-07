@@ -1,0 +1,107 @@
+# 2025.05.19.
+---
+items:
+- name: "Mogyorósi sütemény (Linzer)"
+  price: 390
+  desired: 1
+  available: True
+- name: "Elephant (Baked squeezed pretzels)"
+  price: 530
+  desired: 1
+  available: True
+- name: "Bruschette chips"
+  price: 490
+  desired: 1
+  available: True
+- name: "Kinder Bueno"
+  price: 360
+  desired: 1
+  available: True
+- name: "Bounty"
+  price: 310
+  desired: 1
+  available: True
+- name: "Mars"
+  price: 330
+  desired: 1
+  available: True
+- name: "Snickers"
+  price: 330
+  desired: 1
+  available: True
+- name: "Protein Bar"
+  price: 710
+  desired: 1
+  available: True
+- name: "Sport szelet"
+  price: 250
+  desired: 1
+  available: True
+- name: "Belvita Soft Bakes"
+  price: 350
+  desired: 1
+  available: True
+- name: "Cereal Biscuits"
+  price: 300
+  desired: 1
+  available: True
+- name: "Flapjack"
+  price: 540
+  desired: 1
+  available: True
+- name: "Müzli szelet"
+  price: 280
+  desired: 1
+  available: True
+- name: "M&Ms"
+  price: 280
+  desired: 1
+  available: True
+- name: "Rice up! (Zero sugar)"
+  price: 260
+  desired: 1
+  available: True
+- name: "Földimogyoró / Peanuts"
+  price: 380
+  desired: 1
+  available: True
+- name: "gullón Chocolate Waffel"
+  price: 380
+  desired: 1
+  available: True
+- name: "Sandwitch (Khell Food)"
+  price: 590
+  desired: 1
+  available: True
+- name: "Andante keksz"
+  price: 390
+  desired: 1
+  available: True
+- name: "Goofree"
+  price: 330
+  desired: 1
+  available: True
+- name: "7 Days Croissant"
+  price: 380
+  desired: 1
+  available: True
+- name: "TUC"
+  price: 590
+  desired: 1
+  available: True
+- name: "Nazari Brownie"
+  price: 290
+  desired: 1
+  available: True
+- name: "HYPER"
+  price: 270
+  desired: 1
+  available: True
+- name: "Fanta"
+  price: 440
+  desired: 1
+  available: True
+- name: "MyTea"
+  price: 440
+  desired: 1
+  available: True

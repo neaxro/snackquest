@@ -19,9 +19,6 @@ function MainLayout() {
               <Nav.Link as={NavLink} to="/calculator">
                 Calculator
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/machines">
-                Machines
-              </Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

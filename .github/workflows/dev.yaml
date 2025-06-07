@@ -73,3 +73,5 @@ jobs:
           push: true
           tags: axelnemes/snackquest-dev:frontend-${{ needs.gather-informations.outputs.build_time }}-${{ github.sha }}, axelnemes/snackquest-dev:frontend-latest
           platforms: linux/arm64, linux/amd64
+          build-args: |
+            REACT_APP_BACKEND_URL: http://dev.snackquest.sb.nemes.live/api

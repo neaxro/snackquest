@@ -36,7 +36,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./api
+          context: api
           file: Dockerfile
           push: true
           tags: axelnemes/snackquest-dev:backend-${{ needs.gather-informations.outputs.build_time }}-${{ github.sha }}, axelnemes/snackquest-dev:backend-latest
@@ -62,7 +62,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./frontend
+          context: frontend
           file: Dockerfile
           push: true
           tags: axelnemes/snackquest-dev:frontend-${{ needs.gather-informations.outputs.build_time }}-${{ github.sha }}, axelnemes/snackquest-dev:frontend-latest
